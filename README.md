@@ -1,6 +1,10 @@
 # GPU-NN-Option-Calibration
 Calibration of power-type derivatives for rough volatility with jumps
 
+##  Abstract
+
+In this project, we develop an efficient calibration methodology for a recently proposed rough volatility model with jumps, tailored to the pricing of power-type volatility derivatives. Building on a framework that combines fractional Ornstein–Uhlenbeck variance dynamics driven by a tempered-stable Lévy subordinator and an independent sinusoidal jump component from Wang and Xia (2022) and motivated by high-frequency evidence of jump-dominated volatility dynamics, we focus on calibrating the model to market data for derivatives such as VIX  options. The mathematical model — a rough stochastic volatility process with pure-jump volatility components — serves as the foundation, and the core contribution of this paper is a novel calibration algorithm that leverages the model’s semi-analytical pricing capabilities. This procedure rapidly and robustly fits the model to observed option prices, significantly reducing computation time compared to traditional methods. We verify that a pure-jump rough volatility model adequately captures the VIX dynamics, consistent with prior empirical findings, and demonstrate that our calibration method achieves high accuracy and speed. The results underscore the practicality of rough volatility with jumps for volatility derivatives and the effectiveness of the proposed calibration approach in a real-market setting.\\\\
+\textbf{Keywords}: Rough volatility, VIX options, Volatility jumps, Option Calibration, Neural network, Cupy
 
 ## 🔧 Calibration Pipeline Overview
 
