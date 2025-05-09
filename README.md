@@ -19,7 +19,7 @@ This project accelerates option-pricing calibration by **training a neural‐net
 | Metric                   | Value                                                                                                                                               |
 | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Best offline RMSE (val)  | **3.1 × 10⁻⁴**                                                                                                                                      |
-| Calibration (Jan 2 2025) | GA + L-BFGS-B converged in **< 90 s**                                                                                                               |
+| Calibration (Jan 2 2025) | GA + L-BFGS-B converged in **< 20 min**                                                                                                               |
 | Fitted parameters        | $a=0.0498$, $b=0.8498$, $c=0.8575$, $d=0.7693$, $\kappa=7.7990$,<br>$r_{20} = 0.0020$, $r_{48} = -0.0013$, $r_{100} = -0.0060$, $r_{258} = -0.0124$ |
 | 31-day VIX put back-test | MAE = 0.0329, RMSE = 0.0330                                                                                                          |
 
@@ -31,8 +31,8 @@ This project accelerates option-pricing calibration by **training a neural‐net
 
 * **Maturity pooling:** Current calibration pools all expiries.
   → **TODO:** bucket by maturity and calibrate slices independently.
-* **Data quality:** Snapshot quotes contain arbitrage violations & thin volume.
-  → Clean or weight data before fitting.
+* **Data quality:** Snapshot quotes contain arbitrage violations & thin volume. Do not filter the data using rough arbitrage checking method of put-call parity. 
+  → Clean data using restrictions or weight data before fitting.
 
 
 ---
