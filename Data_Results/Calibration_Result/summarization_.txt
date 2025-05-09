@@ -1,0 +1,28 @@
+Gen  789 | best MSE = 1.869637e-04
+Gen  790 | best MSE = 1.869637e-04
+Gen  791 | best MSE = 1.869637e-04
+Gen  792 | best MSE = 1.869637e-04
+Gen  793 | best MSE = 1.869637e-04
+Gen  794 | best MSE = 1.869637e-04
+Gen  795 | best MSE = 1.869637e-04
+Gen  796 | best MSE = 1.869637e-04
+Gen  797 | best MSE = 1.869637e-04
+Gen  798 | best MSE = 1.869637e-04
+Gen  799 | best MSE = 1.869637e-04
+Gen  800 | best MSE = 1.869637e-04
+✅ Calibration Done,  final MSE (LBFGS) = 2.1076569768694145e-06
+⏱️ Total calibration time: 24203.71 seconds
+
+✅ Final Calibrated Parameters:
+  a      =  0.049762
+  b      =  0.849782
+  c      =  0.857500
+  d      =  0.769302
+  kappa  =  7.798968
+  r1     =  0.001980
+  r2     = -0.001292
+  r3     = -0.006008
+  r4     = -0.012427
+
+GA best MSE   = 1.869637e-04
+L-BFGS MSE     = 2.107657e-06

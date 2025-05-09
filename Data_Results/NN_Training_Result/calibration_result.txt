@@ -1,0 +1,123 @@
+Generation 2993 | Best MSE: 1.960564e-04
+Generation 2994 | Best MSE: 1.960564e-04
+Generation 2995 | Best MSE: 1.960564e-04
+Generation 2996 | Best MSE: 1.960564e-04
+Generation 2997 | Best MSE: 1.960564e-04
+Generation 2998 | Best MSE: 1.960564e-04
+Generation 2999 | Best MSE: 1.960564e-04
+Generation 3000 | Best MSE: 1.960564e-04
+D:\BaiduSyncdisk\Course_project\Math548\Option_Pricing548\Proposition2_split_data\Option_cali_NN_genetic.py:134: OptimizeWarning: Unknown solver options: xatol, fatol
+  result = minimize(
+
+🔍 GA finished.
+GA best MSE: 1.960564e-04
+RUNNING THE L-BFGS-B CODE
+
+           * * *
+
+Machine precision = 2.220D-16
+ N =            9     M =           10
+
+At X0         0 variables are exactly at the bounds
+
+At iterate    0    f=  1.96056D-04    |proj g|=  7.48109D-03
+
+At iterate    1    f=  1.56902D-04    |proj g|=  3.57414D-03
+
+At iterate    2    f=  1.39056D-04    |proj g|=  2.44920D-03
+
+At iterate    3    f=  1.33244D-04    |proj g|=  2.40036D-03
+
+At iterate    4    f=  1.28249D-04    |proj g|=  2.60624D-04
+
+At iterate    5    f=  1.28105D-04    |proj g|=  9.65447D-05
+
+At iterate    6    f=  1.28067D-04    |proj g|=  9.58190D-05
+
+At iterate    7    f=  1.27843D-04    |proj g|=  2.70047D-04
+
+At iterate    8    f=  1.27365D-04    |proj g|=  4.89301D-04
+
+At iterate    9    f=  1.25984D-04    |proj g|=  8.86787D-04
+
+At iterate   10    f=  1.22157D-04    |proj g|=  2.12703D-03
+
+At iterate   11    f=  7.35105D-05    |proj g|=  4.01344D-03
+
+At iterate   12    f=  7.30545D-05    |proj g|=  4.69571D-03
+
+At iterate   13    f=  4.49538D-05    |proj g|=  1.26105D-03
+
+At iterate   14    f=  3.95604D-05    |proj g|=  3.74615D-03
+
+At iterate   15    f=  3.60290D-05    |proj g|=  4.20540D-03
+
+At iterate   16    f=  3.01365D-05    |proj g|=  2.93110D-03
+
+At iterate   17    f=  2.25634D-05    |proj g|=  1.25675D-03
+
+At iterate   18    f=  1.88230D-05    |proj g|=  1.86522D-03
+
+At iterate   19    f=  1.54738D-05    |proj g|=  2.10562D-04
+
+At iterate   20    f=  1.53320D-05    |proj g|=  9.62860D-05
+
+At iterate   21    f=  1.52424D-05    |proj g|=  1.58761D-04
+
+At iterate   22    f=  1.49813D-05    |proj g|=  2.96126D-04
+
+At iterate   23    f=  1.48929D-05    |proj g|=  6.58474D-05
+
+At iterate   24    f=  1.48460D-05    |proj g|=  6.72381D-05
+
+At iterate   25    f=  1.48104D-05    |proj g|=  1.95615D-04
+
+At iterate   26    f=  1.47722D-05    |proj g|=  9.06193D-05
+
+At iterate   27    f=  1.47252D-05    |proj g|=  1.35334D-04
+
+At iterate   28    f=  1.46484D-05    |proj g|=  2.58544D-04
+
+At iterate   29    f=  1.45360D-05    |proj g|=  3.86188D-04
+
+At iterate   30    f=  1.44157D-05    |proj g|=  2.14193D-04
+
+At iterate   31    f=  1.43776D-05    |proj g|=  9.15465D-05
+
+At iterate   32    f=  1.43731D-05    |proj g|=  1.95681D-05
+
+At iterate   33    f=  1.43716D-05    |proj g|=  2.71067D-05
+
+           * * *
+
+Tit   = total number of iterations
+Tnf   = total number of function evaluations
+Tnint = total number of segments explored during Cauchy searches
+Skip  = number of BFGS updates skipped
+Nact  = number of active bounds at final generalized Cauchy point
+Projg = norm of the final projected gradient
+F     = final function value
+
+           * * *
+
+   N    Tit     Tnf  Tnint  Skip  Nact     Projg        F
+    9     33     50     33     0     0   2.711D-05   1.437D-05
+  F =   1.4371599097933137E-005
+
+CONVERGENCE: REL_REDUCTION_OF_F_<=_FACTR*EPSMCH             
+
+✅ Final optimisation finished.
+Final MSE = 1.4371599097933137e-05
+📌 Calibrated parameters:
+  a    = 0.020442
+  b    = 2.725817
+  c    = 0.087589
+  d    = 0.906155
+  kappa= 0.945427
+  r1   = 0.123439
+  r2   = 0.123986
+  r3   = 0.12495
+  r4   = 0.12889
+📈 Calibration fit plot saved to 'fit_after_calibration.png'.
+
+Process finished with exit code 0
