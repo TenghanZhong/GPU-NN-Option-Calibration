@@ -37,23 +37,6 @@ This project accelerates option-pricing calibration by **training a neural‐net
 
 ---
 
-## 🗂️ Repo Structure
-
-```
-├── data/
-│   └── option_prices.parquet   # 5 000 × 4 × 34 synthetic grid
-├── models/
-│   └── fnn_surrogate.pt        # Trained PyTorch weights
-├── src/
-│   ├── generate_dataset.py     # Offline CuPy + mpmath pricing
-│   ├── train_fnn.py            # Surrogate training script
-│   ├── calibrate_ga_lbfgsb.py  # Two-stage calibration
-│   └── utils.py
-└── README.md                   # ← you are here
-```
-
----
-
 ### How to Reproduce
 
 ```bash
