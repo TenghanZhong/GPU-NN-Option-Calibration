@@ -1,8 +1,8 @@
 # ───────── option_cali_nn_cma_lbfgs.py ─────────
 """
-2-Stage Calibration (升级版):
-1. CMA-ES               —— 全局搜索
-2. L-BFGS-B             —— 局部精细化
+2-Stage Calibration :
+1. CMA-ES               —— Global
+2. L-BFGS-B             —— Local
 输出进度图 + 拟合散点图
 """
 
@@ -87,7 +87,7 @@ def calibrate(df, device="cpu",
         es.tell(xs,fs); history.append(es.best.f)
 
     θ_cma, f_cma = es.result.xbest, es.result.fbest
-    print(f"🌍 CMA-ES  best MSE = {f_cma:.6e}")
+    print(f" CMA-ES  best MSE = {f_cma:.6e}")
 
     # ---- L-BFGS-B local refinement ----
     res = minimize(loss, θ_cma, method="L-BFGS-B",
@@ -104,13 +104,13 @@ def calibrate(df, device="cpu",
     plt.ylabel("MSE (log scale)"); plt.grid(); plt.legend(); plt.tight_layout()
     plt.savefig("cali_progress.png",dpi=150); plt.close()
 
-    # 预测值
+    # prediction
     Xn = torch.tensor(scX.transform(make_X(df, θ_opt))).double().to(device)
     with torch.no_grad():
         pred = net(Xn).cpu().numpy()
 
     y_hat = scY.inverse_transform(pred).ravel()  # NN预测还原
-    y_true = df["opt_price"].values  # 真实Market价格
+    y_true = df["opt_price"].values  # real market price
 
     m, M = min(y_true.min(), y_hat.min()), max(y_true.max(), y_hat.max())
 
@@ -149,4 +149,5 @@ if __name__ == "__main__":
     data = (pd.read_excel(r"C:\Users\26876\Desktop\Math548\Project\02_jan_put.xlsx")
               .rename(columns={"Strike_Put":"k","TTM_Put":"T","mid_price_Put":"opt_price"}))
     data["opt_price"] /= 100
-    calibrate(data, device="cuda")       # 改成 "cpu" 亦可
+    calibrate(data, device="cuda")       # can also change to "cpu" 
+
