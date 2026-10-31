@@ -8,6 +8,12 @@
 # Tested on CUDA‑11 + CuPy‑12.x
 # ---------------------------------------------
 
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+_PROJECT_ROOT = _Path(_os.environ.get("GPU_NN_PROJECT_ROOT", str(_REPO_ROOT / "Data_Results"))).expanduser()
+
 import os, sys, time, math
 import numpy as np
 import cupy as cp
@@ -170,10 +176,10 @@ def show_progress(ga_inst):
     print(f"Gen {ga_inst.generations_completed:4d} | best MSE = {best:.6e}",
           flush=True)
 
-import matplotlib.pyplot as plt      # 你的文件里已 import，忽略
+import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
-history = []  # 放在全局
+history = []  # Calibration progress history
 
 def calibrate(df, pop_size=500, gens=800, seed=2025):
     global global_df
@@ -221,7 +227,7 @@ def calibrate(df, pop_size=500, gens=800, seed=2025):
     plt.ylabel("Best MSE")
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig(r"C:\Users\26876\Desktop\Math548\Project\Not_NN_Calibration\progress_cf.png")
+    plt.savefig(str(_PROJECT_ROOT / "Not_NN_Calibration/progress_cf.png"))
     plt.show()
     plt.close()
 
@@ -250,7 +256,7 @@ def calibrate(df, pop_size=500, gens=800, seed=2025):
     plt.grid(True)
     plt.legend()
     plt.tight_layout()
-    plt.savefig(r"C:\Users\26876\Desktop\Math548\Project\Not_NN_Calibration\market_vs_model.png")  # 若只想显示改成 plt.show()
+    plt.savefig(str(_PROJECT_ROOT / "Not_NN_Calibration/market_vs_model.png"))  # 若只想显示改成 plt.show()
     plt.close()
 
     # ―― ②  Strike–Price 曲线按到期 T 上色 ――
@@ -277,7 +283,7 @@ def calibrate(df, pop_size=500, gens=800, seed=2025):
     plt.grid(True)
     plt.legend(fontsize=8, ncol=2)
     plt.tight_layout()
-    plt.savefig(r"C:\Users\26876\Desktop\Math548\Project\Not_NN_Calibration\strike_curves.png")  # 或者 plt.show()
+    plt.savefig(str(_PROJECT_ROOT / "Not_NN_Calibration/strike_curves.png"))  # 或者 plt.show()
     plt.show()
     plt.close()
 
@@ -291,7 +297,7 @@ def calibrate(df, pop_size=500, gens=800, seed=2025):
 # main demo
 # ──────────────────────────────────────────────
 if __name__=="__main__":
-    df = pd.read_excel(r"C:\Users\26876\Desktop\Math548\Project\02_jan_put.xlsx")
+    df = pd.read_excel(str(_PROJECT_ROOT / "02_jan_put.xlsx"))
     df=df.rename(columns={"Strike_Put":"k","TTM_Put":"T","mid_price_Put":"opt_price"})
     df["opt_price"]/=100; df["T"]/=365; df["spot_price"]=0.1793
 

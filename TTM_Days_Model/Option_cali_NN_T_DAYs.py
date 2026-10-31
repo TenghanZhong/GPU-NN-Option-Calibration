@@ -2,13 +2,15 @@
 
 
 2-Stage calibration (GA + L-BFGS-B) using **relative-RMSE**
-(Re-written calibrate() to mirror the workflow you liked in the MSE version:  
-- keeps a generation-by-generation history curve,  
-- prints GA summary,  
-- runs a local optimiser for refinement,  
-- dumps calibrated parameters to a txt file,  
-- saves a loss curve and a Market vs Model scatter after calibration.)
+Records the GA loss history, refines the solution with L-BFGS-B, and saves
+calibrated parameters, the loss curve, and a market-versus-model scatter plot.
 '''
+
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+_PROJECT_ROOT = _Path(_os.environ.get("GPU_NN_PROJECT_ROOT", str(_REPO_ROOT / "Data_Results"))).expanduser()
 
 import pathlib, joblib, numpy as np, pandas as pd, torch
 import torch.nn as nn, pygad, multiprocessing as mp
@@ -16,7 +18,7 @@ import matplotlib.pyplot as plt
 from  scipy.optimize import minimize
 
 # ── paths & consts ─────────────────────────────────────────────────────────
-PROJECT_DIR = pathlib.Path(r"C:\Users\26876\Desktop\Math548\Project")
+PROJECT_DIR = pathlib.Path(str(_PROJECT_ROOT))
 MODEL_W     = PROJECT_DIR / "model_5000_days.pt"
 SCALERS_PKL = PROJECT_DIR / "scalers_5000_days.pkl"
 T_LIST      = np.array([258, 100, 48, 20], dtype=float)
@@ -83,7 +85,7 @@ def build_rel_rmse(df, net, scX, scY, device):
     return rel_rmse
 
 
-# ── calibrator (rewritten) ─────────────────────────────────────────────────
+# ── calibrator ─────────────────────────────────────────────────
 
 def calibrate(df: pd.DataFrame, device: str = "cuda", pop: int = 400,
               gens: int = 4000, seed=None):

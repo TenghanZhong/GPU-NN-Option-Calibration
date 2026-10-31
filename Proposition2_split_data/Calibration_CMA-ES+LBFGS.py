@@ -6,6 +6,12 @@
 输出进度图 + 拟合散点图
 """
 
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+_PROJECT_ROOT = _Path(_os.environ.get("GPU_NN_PROJECT_ROOT", str(_REPO_ROOT / "Data_Results"))).expanduser()
+
 import pathlib, joblib, numpy as np, pandas as pd, torch
 import torch.nn as nn
 import cma                              # ← pip install cma
@@ -14,7 +20,7 @@ import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 
 # ---------- 1.  Paths ----------
-PROJ  = pathlib.Path(r"C:\Users\26876\Desktop\Math548\Project")
+PROJ  = pathlib.Path(str(_PROJECT_ROOT))
 MODEL = PROJ / "model.pt"
 SCAL  = PROJ / "scalers.pkl"
 T_LIST = np.array([258,100,48,20], dtype=float)
@@ -146,7 +152,7 @@ def calibrate(df, device="cpu",
 
 # ---------- 7. run ----------
 if __name__ == "__main__":
-    data = (pd.read_excel(r"C:\Users\26876\Desktop\Math548\Project\02_jan_put.xlsx")
+    data = (pd.read_excel(str(_PROJECT_ROOT / "02_jan_put.xlsx"))
               .rename(columns={"Strike_Put":"k","TTM_Put":"T","mid_price_Put":"opt_price"}))
     data["opt_price"] /= 100
     calibrate(data, device="cuda")       # can also change to "cpu" 

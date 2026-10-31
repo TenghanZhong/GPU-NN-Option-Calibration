@@ -2,6 +2,12 @@
 # -*- coding: utf-8 -*-
 # Proposition‑2 characteristic‑function generator (GPU + multiprocessing, CuPy‑float64)
 
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+_PROJECT_ROOT = _Path(_os.environ.get("GPU_NN_PROJECT_ROOT", str(_REPO_ROOT / "Data_Results"))).expanduser()
+
 import cupy as cp
 from cupyx.scipy import special as cpsp
 import numpy as np
@@ -147,13 +153,13 @@ if __name__ == "__main__":
     })
     df["l"]   = np.tile(l_np, len(a_np))
     df["phi"] = phi_real.ravel()
-    out = r"C:\Users\26876\Desktop\Math548\Project\Proposition2_gpu_multi.parquet"
+    out = str(_PROJECT_ROOT / "Proposition2_gpu_multi.parquet")
     df.to_parquet(out, index=False, engine="fastparquet")
     print(f"✓ 生成完毕：{len(df):,} 行 → {out}")
     print(f"⏱ 总耗时 {time.time()-tic:.2f}s")
     # ① 读取两个 parquet
-    cpu_df = pd.read_parquet(r"C:\Users\26876\Desktop\Math548\Project\Proposition2_dataset.parquet")
-    gpu_df = pd.read_parquet(r"C:\Users\26876\Desktop\Math548\Project\Proposition2_gpu_multi.parquet")
+    cpu_df = pd.read_parquet(str(_PROJECT_ROOT / "Proposition2_dataset.parquet"))
+    gpu_df = pd.read_parquet(str(_PROJECT_ROOT / "Proposition2_gpu_multi.parquet"))
 
     # ② 按 6 个 θ 参数 + l 对齐
     key_cols = ['a', 'b', 'c', 'd', 'kappa', 'r', 'l']  # 这些列必须 dtype 完全一致

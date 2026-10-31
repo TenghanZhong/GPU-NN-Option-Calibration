@@ -1,4 +1,10 @@
 # ───── price_dataset_gpu_with_t.py ────────────────────────────────
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+_PROJECT_ROOT = _Path(_os.environ.get("GPU_NN_PROJECT_ROOT", str(_REPO_ROOT / "Data_Results"))).expanduser()
+
 from cupyx.scipy import special as cpsp
 import cupy as cp
 import numpy as np
@@ -133,7 +139,7 @@ if __name__ == "__main__":
 
     df = pd.DataFrame(np.vstack(rows),
           columns=["a","b","c","d","kappa","r","t","K","price_put"])
-    out_path = r"C:\Users\26876\Desktop\Math548\Project\Option_put_price_dataset_gpu.parquet"
+    out_path = str(_PROJECT_ROOT / "Option_put_price_dataset_gpu.parquet")
     df.to_parquet(out_path, index=False, engine="fastparquet")
     print(f"✓ Saved {len(df)} rows to {out_path}")
 

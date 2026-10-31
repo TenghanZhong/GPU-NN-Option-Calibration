@@ -1,3 +1,9 @@
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+_PROJECT_ROOT = _Path(_os.environ.get("GPU_NN_PROJECT_ROOT", str(_REPO_ROOT / "Data_Results"))).expanduser()
+
 import numpy as np
 import pandas as pd
 from scipy.stats import qmc
@@ -23,8 +29,8 @@ t = 27
 t0 = 0
 Delta = 0.083   # roughly 30 days expressed in years (e.g., for VIX)
 I_t0_delta = 0.2667
-# Your existing functions...
-# -------------- 原 φ_Z1, φ_X1, kernel 等函数 --------------
+# Characteristic functions and kernel definitions
+# -------------- Characteristic functions and kernel --------------
 def phi_Z1(l, alpha):
     return mpmath.exp(-abs(l) ** alpha)
 
@@ -83,7 +89,7 @@ def _dbl_of_l(idx, g_vec_local):
         acc += coef * _psi(l, x) * g_vec_local[j]
     return acc * dx / 3
 
-# ---------- 其余原函数 ----------
+# ---------- Additional model functions ----------
 def compute_J(t, t0, Delta, I_t0_delta, r, a, b, c, d, kappa):
     xi1 = a * mpmath.gamma(1 - c) / (b ** (c - 1))
     int1 = mpmath.quad(lambda s: H_kernel_III_delta(t, s, Delta, d, kappa), [t0, t])
@@ -177,6 +183,6 @@ if __name__ == "__main__":
                       columns=["a","b","c","d","kappa","r","l","phi"])
     df.head().to_parquet("test.parquet", engine="fastparquet")
     pd.read_parquet("test.parquet").head()
-    df.to_parquet(r"C:\Users\26876\Desktop\Math548\Project\Proposition2_dataset.parquet",
+    df.to_parquet(str(_PROJECT_ROOT / "Proposition2_dataset.parquet"),
                   index=False, engine="fastparquet")
     print("✓ 特征函数数据集已生成，共", len(df), "条记录")

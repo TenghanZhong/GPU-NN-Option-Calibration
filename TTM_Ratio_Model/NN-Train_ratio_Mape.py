@@ -5,10 +5,16 @@
 """
 Train a generic feed-forward NN for put-option pricing, while:
 • reporting absolute & relative errors every epoch (standardised space)
-• printing *dollar-space* metrics for Train / Val / Test after training
-• optional moneyness-bucket diagnostics + plots
+• printing price-space metrics for training and validation after training
+• plotting training curves and validation predictions
 Compatible with Python 3.7+ (no PEP-604 syntax).
 """
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+_PROJECT_ROOT = _Path(_os.environ.get("GPU_NN_PROJECT_ROOT", str(_REPO_ROOT / "Data_Results"))).expanduser()
+
 import argparse, pathlib, joblib, math
 from typing import Union, Sequence
 
@@ -150,7 +156,7 @@ def train_early_stop(net, opt, Xtr, Ytr, Xte, Yte,
         net.load_state_dict(best_w)
     return best_ep, best_val, curves
 
-# ---------- 6. Aux plots (unchanged) ----------
+# ---------- 6. Auxiliary plots ----------
 def save_train_curves(curves, out: pathlib.Path, best_ep):
     plt.figure(figsize=(8,4))
     plt.plot(curves["train_abs"], label="Train abs-RMSE", marker="o")
@@ -196,7 +202,7 @@ def main(cfg):
     with torch.no_grad():
         preds_tr = net(Xt.to(dev)).cpu().numpy()
         preds_val= net(Xv.to(dev)).cpu().numpy()
-        preds_te = preds_val  # alias (test == validation split)
+        preds_te = preds_val  # Alias of the early-stopping validation predictions
 
     Ytr_orig  = scY.inverse_transform(Yt.cpu().numpy())
     Yval_orig = scY.inverse_transform(Yv.cpu().numpy())
@@ -220,16 +226,13 @@ def main(cfg):
     print(f"σ_y (target std)  : {sigma_y:.6e}")
     print(f"Train abs-RMSE ($): {abs_tr :.6f}")
     print(f"Val   abs-RMSE ($): {abs_val:.6f}")
-    print(f"Test  abs-RMSE ($): {abs_te :.6f}")
+    print(f"Val (reused) abs-RMSE ($): {abs_te :.6f}")
     print(f"Val   rel-RMSE    : {rel_val_rmse*100:,.2f}%")
     print(f"Val   MAPE        : {rel_val_mape*100:,.2f}%")
     print("────────────────────────────────────────\n")
 
-    # ---- Diagnostics by moneyness (optional) ----
-    # (kept exactly as your original block)
-
     # ---- Plots / save model ----
-    outdir = pathlib.Path(r"C:\Users\26876\Desktop\Math548\Project\Comment")
+    outdir = pathlib.Path(str(_PROJECT_ROOT / "Comment"))
     outdir.mkdir(exist_ok=True)
     torch.save(net.state_dict(), outdir / "model_rel_errors.pt")
     joblib.dump({"scX": scX, "scY": scY,
@@ -243,7 +246,7 @@ def main(cfg):
 # ---------- 8. Run (quick config) ----------
 if __name__ == "__main__":
     cfg = dict(
-        file=r"C:\Users\26876\Desktop\Math548\Project\Option_put_price_dataset_mpmath_5000_divided.parquet",
+        file=str(_PROJECT_ROOT / "Option_put_price_dataset_mpmath_5000_divided.parquet"),
         in_cols=["a","b","c","d","kappa","r","t","K"],
         out_cols=["price_put"],
         test_size=0.05,

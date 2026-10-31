@@ -1,11 +1,16 @@
-# └└└ 改进版 Option_cali_NN_genetic_2stage.py └└└
+# Two-stage surrogate calibration with absolute MSE
 """
 2-Stage Calibration:
 1. Genetic Algorithm (GA) for global search.
-2. Local Optimization (Nelder-Mead) for refinement.
-Optimized for better precision and convergence.
+2. L-BFGS-B for bounded local refinement.
 Compatible with PyGAD 3.x.x
 """
+
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+_PROJECT_ROOT = _Path(_os.environ.get("GPU_NN_PROJECT_ROOT", str(_REPO_ROOT / "Data_Results"))).expanduser()
 
 import pathlib, joblib, numpy as np, pandas as pd, torch
 import torch.nn as nn
@@ -16,7 +21,7 @@ import time
 import matplotlib.cm as cm
 
 # —— 1. Paths & Constants ——
-PROJECT_DIR = pathlib.Path(r"C:\Users\26876\Desktop\Math548\Project\TTM_Ratio_Results")
+PROJECT_DIR = pathlib.Path(str(_PROJECT_ROOT / "TTM_Ratio_Results"))
 MODEL_W     = PROJECT_DIR / "model_5000_ratio.pt"
 SCALERS_PKL = PROJECT_DIR / "scalers_5000_ratio.pkl"
 T_LIST = np.array([258, 100, 48, 20], dtype=float)/252
@@ -62,9 +67,9 @@ def load_nn(device="cpu"):
            .double().to(device))
     net.load_state_dict(torch.load(MODEL_W, map_location=device))
     net.eval()
-    return net, scX, scY, in_cols                 # ← 把 in_cols 也返回
+    return net, scX, scY, in_cols                 # Include the training column order
 
-# ---------- 修改这一段 ----------
+# Build inputs in the training column order
 def make_inputs(df: pd.DataFrame, theta: np.ndarray, *, in_cols):
     a, b, c, d, kappa, *rates = theta
 
@@ -75,7 +80,7 @@ def make_inputs(df: pd.DataFrame, theta: np.ndarray, *, in_cols):
     tmp["a"], tmp["b"], tmp["c"], tmp["d"], tmp["kappa"] = a, b, c, d, kappa
     tmp["r"] = r_vec
 
-    # 🆕 映射列名，确保和训练时一致
+    # Align column names with the training data
     tmp = tmp.rename(columns={"T": "t", "k": "K"})
 
     X = tmp[in_cols].values
@@ -86,7 +91,7 @@ def make_inputs(df: pd.DataFrame, theta: np.ndarray, *, in_cols):
 # —— 4. Fitness Function ——
 def fitness_factory(df, net, scX, scY, in_cols, device):
     def mse(theta):
-        X = make_inputs(df, theta, in_cols=in_cols)  # ✅ 修复这里
+        X = make_inputs(df, theta, in_cols=in_cols)
         Xn = torch.tensor(scX.transform(X)).double().to(device)
         with torch.no_grad():
             preds = net(Xn).cpu().numpy()
@@ -250,7 +255,7 @@ def calibrate(df: pd.DataFrame, device="cpu",
 
 # —— 6. Script Entry ——
 if __name__ == "__main__":
-    df = (pd.read_excel(r"C:\Users\26876\Desktop\Math548\Project\02_jan_put.xlsx")
+    df = (pd.read_excel(str(_PROJECT_ROOT / "02_jan_put.xlsx"))
             .rename(columns={"Strike_Put":"k",
                              "TTM_Put":"T",
                              "mid_price_Put":"opt_price"}))

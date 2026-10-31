@@ -2,6 +2,12 @@
 # -*- coding: utf-8 -*-
 # Proposition‑2 characteristic‑function generator (GPU + multiprocessing, CuPy‑float64)
 
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+_PROJECT_ROOT = _Path(_os.environ.get("GPU_NN_PROJECT_ROOT", str(_REPO_ROOT / "Data_Results"))).expanduser()
+
 import cupy as cp
 from cupyx.scipy import special as cpsp
 import numpy as np
@@ -23,7 +29,7 @@ def simpson_weights(n: int, dtype=cp.float64) -> cp.ndarray:
 
 # ───────────────────────── Worker ───────────────────────────
 def phi_worker_gpu(args):
-    """GPU worker executed in subprocesses (§ same as original)."""
+    """GPU worker executed in a subprocess."""
     (theta_idx, chunk_start, l_chunk,
      a_, b_, c_, d_, kappa_, r_, J_,
      term_col, dbl_chunk, w_s, ds) = args
@@ -212,7 +218,7 @@ def main():
     phi_real = compute_phi_parallel(tasks, n_theta=len(a_np), n_l=len(l_np))
 
     # 6. Save parquet
-    gpu_parquet = Path(r"C:\Users\26876\Desktop\Math548\Project\proposition2\Proposition2_gpu_multi123.parquet")
+    gpu_parquet = Path(str(_PROJECT_ROOT / "proposition2/Proposition2_gpu_multi123.parquet"))
     save_parquet(phi_real, l_np,
                  params=[a_np,b_np,c_np,d_np,kappa_np,r_np],
                  out_path=gpu_parquet)
@@ -221,14 +227,14 @@ def main():
     print(f"⏱ 总耗时 {time.time()-tic:.2f}s")
 
     # 7. Compare with CPU reference
-    cpu_parquet = Path(r"C:\Users\26876\Desktop\Math548\Project\proposition2\Proposition2_dataset.parquet")
+    cpu_parquet = Path(str(_PROJECT_ROOT / "proposition2/Proposition2_dataset.parquet"))
     compare_with_cpu(cpu_parquet, gpu_parquet)
 
 
 
 
 # ───────────────────────── Runner ───────────────────────────
-if __name__ == "__main__":          # <‑‑ One clear entry‑point
+if __name__ == "__main__":          # Script entry point
     freeze_support()                # needed on Windows
     main()
 '''

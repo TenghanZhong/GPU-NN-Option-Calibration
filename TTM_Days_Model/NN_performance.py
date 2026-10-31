@@ -1,3 +1,9 @@
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+_PROJECT_ROOT = _Path(_os.environ.get("GPU_NN_PROJECT_ROOT", str(_REPO_ROOT / "Data_Results"))).expanduser()
+
 import torch
 import joblib
 import pandas as pd
@@ -9,9 +15,9 @@ from sklearn.preprocessing import StandardScaler
 import torch.nn as nn
 
 # ---- 1. 加载数据 ----
-data_file = r"C:\Users\26876\Desktop\Math548\Project\Option_put_price_dataset_mpmath.parquet"
-model_file = r"C:\Users\26876\Desktop\Math548\Project\model.pt"
-scaler_file = r"C:\Users\26876\Desktop\Math548\Project\scalers.pkl"
+data_file = str(_PROJECT_ROOT / "Option_put_price_dataset_mpmath.parquet")
+model_file = str(_PROJECT_ROOT / "model.pt")
+scaler_file = str(_PROJECT_ROOT / "scalers.pkl")
 
 # 加载数据
 df = pd.read_parquet(data_file)

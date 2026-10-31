@@ -1,3 +1,9 @@
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+_PROJECT_ROOT = _Path(_os.environ.get("GPU_NN_PROJECT_ROOT", str(_REPO_ROOT / "Data_Results"))).expanduser()
+
 import numpy as np
 import torch
 import joblib
@@ -27,7 +33,7 @@ class GenericNet(nn.Module):
         return self.net(x)
 
 # -------- 2. 参数路径 --------
-PROJECT_DIR = Path(r"C:\Users\26876\Desktop\Math548\Project")
+PROJECT_DIR = Path(str(_PROJECT_ROOT))
 MODEL_W     = PROJECT_DIR / "model_5000_days.pt"
 SCALERS_PKL = PROJECT_DIR / "scalers_5000_days.pkl"
 

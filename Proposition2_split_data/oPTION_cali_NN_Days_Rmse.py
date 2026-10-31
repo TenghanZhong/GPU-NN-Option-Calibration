@@ -3,13 +3,19 @@
 2-Stage calibration (GA + L-BFGS-B) using **relative-RMSE**
 """
 
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+_PROJECT_ROOT = _Path(_os.environ.get("GPU_NN_PROJECT_ROOT", str(_REPO_ROOT / "Data_Results"))).expanduser()
+
 import pathlib, joblib, numpy as np, pandas as pd, torch
 import torch.nn as nn, pygad, multiprocessing as mp
 import matplotlib.pyplot as plt
 from  scipy.optimize import minimize
 
 # ── paths & consts ─────────────────────────────────────────────────────────
-PROJECT_DIR = pathlib.Path(r"C:\Users\26876\Desktop\Math548\Project")
+PROJECT_DIR = pathlib.Path(str(_PROJECT_ROOT))
 MODEL_W     = PROJECT_DIR / "model_5000_days.pt"
 SCALERS_PKL = PROJECT_DIR / "scalers_5000_days.pkl"
 T_LIST      = np.array([258, 100, 48, 20], dtype=float)
@@ -95,7 +101,7 @@ def calibrate(df, device="cuda", pop=400, gens=3000, seed=None):
 
 # ── run ────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    df = (pd.read_excel(r"C:\Users\26876\Desktop\Math548\Project\02_jan_put.xlsx")
+    df = (pd.read_excel(str(_PROJECT_ROOT / "02_jan_put.xlsx"))
             .rename(columns={"Strike_Put":"k","TTM_Put":"T","mid_price_Put":"opt_price"}))
     df["opt_price"] /= 100
     calibrate(df, device="cuda")

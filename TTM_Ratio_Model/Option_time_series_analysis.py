@@ -1,5 +1,11 @@
 # vix_prop2_gpu.py  –––  Prop-2  GPU  forecast only
 # ==================================================
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+_PROJECT_ROOT = _Path(_os.environ.get("GPU_NN_PROJECT_ROOT", str(_REPO_ROOT / "Data_Results"))).expanduser()
+
 import os, time, sys, math
 import numpy as np
 import pandas as pd
@@ -89,7 +95,7 @@ RATES = np.array([r1,r2,r3,r4])
 # ─── 6. Main: time-series forecast  ───────────────
 if __name__ == "__main__":
     # ─── 6. Paths ─────────────────────────────────────
-    base = r"C:\Users\26876\Desktop\Math548\Project"  # ← 你的项目根目录
+    base = str(_PROJECT_ROOT)  # Local data and output directory
     outdir = os.path.join(base, "out");
     os.makedirs(outdir, exist_ok=True)
 

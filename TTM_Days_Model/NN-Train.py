@@ -1,4 +1,10 @@
-# ─────────── general_nn_trainer.py (with test‑set plotting) ───────────
+# NN-Train.py: surrogate training and validation plots
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+_PROJECT_ROOT = _Path(_os.environ.get("GPU_NN_PROJECT_ROOT", str(_REPO_ROOT / "Data_Results"))).expanduser()
+
 import argparse, pathlib, joblib, math
 import torch, torch.nn as nn, torch.optim as optim
 import pandas as pd
@@ -176,7 +182,7 @@ def train_early_stopping(net, opt, Xtr, Ytr, Xte, Yte, epochs, batch, device, pa
         print(f"📦 Restored best model weights from epoch {best_epoch}.")
 
     # ── 保存最终画图 ──
-    out_dir = pathlib.Path(r"C:\Users\26876\Desktop\Math548\Project")
+    out_dir = pathlib.Path(str(_PROJECT_ROOT))
     out_dir.mkdir(exist_ok=True)
 
     plt.figure(figsize=(10, 5))
@@ -197,7 +203,7 @@ def train_early_stopping(net, opt, Xtr, Ytr, Xte, Yte, epochs, batch, device, pa
 
 # ---------- 5.  Plot ----------
 
-def plot_results(y_true, y_pred, out_dir: pathlib.Path, title="NN prediction vs. true on test‑set"):
+def plot_results(y_true, y_pred, out_dir: pathlib.Path, title="NN prediction vs. true on validation‑set"):
     """Scatter/line plot comparing y_true and y_pred for each output dimension."""
     y_true, y_pred = map(lambda t: t.reshape(-1, t.shape[-1]), (y_true, y_pred))
     n_dims = y_true.shape[1]
@@ -218,7 +224,7 @@ def plot_results(y_true, y_pred, out_dir: pathlib.Path, title="NN prediction vs.
     print(f"📈 plot saved to {fname}")
 import numpy as np
 
-def plot_results_small_sample(y_true, y_pred, out_dir: pathlib.Path, n_samples=100, title="NN Prediction vs True (Small Sample)"):
+def plot_results_small_sample(y_true, y_pred, out_dir: pathlib.Path, n_samples=100, title="NN Prediction vs True (Validation Subset)"):
     """随机选 n_samples 个点，画预测 vs 真值的对比图。"""
     assert y_true.shape == y_pred.shape
     n_total = y_true.shape[0]
@@ -263,7 +269,7 @@ def main(cfg):
     train_curve, val_curve = train_early_stopping(net, opt, Xt, Yt, Xv, Yv, cfg["epochs"], cfg["batch"], dev, patience=25)
 
     # ── 保存路径 ──
-    out = pathlib.Path(r"C:\Users\26876\Desktop\Math548\Project")
+    out = pathlib.Path(str(_PROJECT_ROOT))
     out.mkdir(exist_ok=True)
 
     # 保存模型权重
@@ -292,24 +298,24 @@ def main(cfg):
     # ── 画图 ──
     plot_results(Y_true_orig, preds_orig, out)
 
-    print("✅ Model & plots saved to C:/Users/26876/Desktop/Math548/Project/")
+    print(f"Model and plots saved to {_PROJECT_ROOT}")
 
-    # ── 原本画全部点
+    # Plot all validation predictions
     plot_results(Y_true_orig, preds_orig, out)
 
-    # 🆕 新加一行 —— 只画小样本
+    # Plot a random subset for readability
     plot_results_small_sample(Y_true_orig, preds_orig, out, n_samples=100)
 
-    # ── 计算最终 test set RMSE ──
+    # ── 计算最终 validation set RMSE ──
     final_test_rmse = math.sqrt(((Y_true_orig - preds_orig) ** 2).mean())
-    print(f"🏁 Final Test Set RMSE (after inverse transform): {final_test_rmse:.6f}")
+    print(f"🏁 Final Validation Set RMSE (after inverse transform): {final_test_rmse:.6f}")
 
 # ---------- 7.  Run ----------
 
 if __name__ == "__main__":
-    # ——用 CLI 时注释掉下面 cfg 并调用 main(get_args())——
+    # Script configuration; paths refer to local data and output directories.
     cfg = dict(
-        file=r"C:\Users\26876\Desktop\Math548\Project\Option_put_price_dataset_mpmath_5000.parquet",
+        file=str(_PROJECT_ROOT / "Option_put_price_dataset_mpmath_5000.parquet"),
         in_cols=["a", "b", "c", "d", "kappa", "r", "t", "K"],
         out_cols=["price_put"],
         test_size=0.05,
@@ -323,12 +329,11 @@ if __name__ == "__main__":
         device="cuda",
         dropout=0,
     )
-    main(cfg)  # ← 直接运行
-    # main(get_args())        # ← 改成这行即可走命令行
+    main(cfg)  # Run with the configuration above
 '''
  从 parquet 文件加载 θ, t, K → price_put
    → 数据归一化
    → 构建 NN 模型：f(θ, t, K) → price_put
    → MSE 训练并保存模型
-   → 可视化 NN 在 test set 上的预测能力
+   → 可视化 NN 在 validation set 上的预测能力
 '''

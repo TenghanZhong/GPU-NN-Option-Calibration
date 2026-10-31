@@ -1,22 +1,28 @@
-# ─────────── nn_price_plot.py ───────────
+# Cali_Comparision_ratio.py
 """
-After running nn_calibrator.py and obtaining the optimal parameter vector
+After running Option_cali_NN_genetic_MSE_ratio.py and obtaining the parameter vector
 `theta*  = [a,b,c,d,kappa,r1,r2,r3,r4]`,
 this script:
 1.  Loads the trained neural network and the scalers.
 2.  Uses theta* to generate model prices for every row in the input Excel file.
-3.  Plots model prices (+) against market prices (o) exactly like the sample figure.
+3.  Plots model prices (+) against market prices (o).
 """
+
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+_PROJECT_ROOT = _Path(_os.environ.get("GPU_NN_PROJECT_ROOT", str(_REPO_ROOT / "Data_Results"))).expanduser()
 
 import pathlib, joblib, numpy as np, pandas as pd, torch
 import matplotlib.pyplot as plt
 import sys
-sys.path.append(r"D:\BaiduSyncdisk\Course_project\Math548\Option_Pricing548")
+sys.path.append(str(_REPO_ROOT))
 
 # --------------------------------------------------------------------------- #
-# 1.  paths & constants (adjust if yours differ)
+# 1.  paths & constants
 # --------------------------------------------------------------------------- #
-PROJECT_DIR = pathlib.Path(r"C:\Users\26876\Desktop\Math548\Project\TTM_Ratio_Results")
+PROJECT_DIR = pathlib.Path(str(_PROJECT_ROOT / "TTM_Ratio_Results"))
 MODEL_W     = PROJECT_DIR / "model_5000_ratio.pt"
 SCALERS_PKL = PROJECT_DIR / "scalers_5000_ratio.pkl"
 
@@ -100,7 +106,7 @@ def price_and_plot(excel_path: str, theta_opt, device="cpu"):
     for i, row in df.iterrows():
         print(f"Strike: {row['k']:.2f}, Market Price: {row['opt_price']:.4f}, Model Price: {row['model_price']:.4f}")
 
-    # 🆕 4.4 计算误差
+    # 4.4 计算误差
     market = df["opt_price"].values
     model = df["model_price"].values
 
@@ -116,7 +122,7 @@ def price_and_plot(excel_path: str, theta_opt, device="cpu"):
     print(f"RMSE = {rmse:.6f}")
     print(f"MAPE = {mape:.2f}%")
 
-    # 🆕 4.5 保存误差到 txt 文件
+    # 4.5 保存误差到 txt 文件
     error_text = (
         f"Error Metrics:\n"
         f"MSE  = {mse:.6f}\n"
@@ -141,7 +147,7 @@ def price_and_plot(excel_path: str, theta_opt, device="cpu"):
     plt.savefig(PROJECT_DIR / 'put_price_fit.png', dpi=300)
     plt.show()
 
-    # 🆕 4.7 可选：保存df到excel
+    # 4.7 可选：保存df到excel
     df.to_excel(PROJECT_DIR / 'put_price_fit.xlsx', index=False)
 
     return df
@@ -151,7 +157,7 @@ def price_and_plot(excel_path: str, theta_opt, device="cpu"):
 # 5.  example usage
 # --------------------------------------------------------------------------- #
 if __name__ == "__main__":
-    # theta_opt should be the array printed by nn_calibrator.calibrate(...)
+    # theta_opt should be the parameter array returned by the selected calibrator
     theta_opt = [
         0.05732,  # a
         4.57577,  # b
@@ -166,7 +172,7 @@ if __name__ == "__main__":
 
 
     price_and_plot(
-        excel_path=r"C:\Users\26876\Desktop\Math548\Project\02_jan_put.xlsx",
+        excel_path=str(_PROJECT_ROOT / "02_jan_put.xlsx"),
         theta_opt=theta_opt,
         device="cuda"                                                # or "cpu"
     )

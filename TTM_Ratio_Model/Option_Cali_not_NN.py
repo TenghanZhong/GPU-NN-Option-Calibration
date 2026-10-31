@@ -1,3 +1,9 @@
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+_PROJECT_ROOT = _Path(_os.environ.get("GPU_NN_PROJECT_ROOT", str(_REPO_ROOT / "Data_Results"))).expanduser()
+
 import numpy as np
 import cupy as cp
 import mpmath
@@ -145,7 +151,7 @@ def gamma_term_factory(K):
 # ── GPU φ 缓存结构 ──
 
 class PhiStore:
-    """批量缓存 φ(l; T,r) —— 关键修改：一次 get() 全量转回 CPU"""
+    """批量缓存 φ(l; T,r)，并一次性将计算结果从 GPU 转回 CPU"""
 
     def __init__(self, theta, spot_price, batch=64):
         self.a, self.b, self.c, self.d, self.kappa, self.r, self.t = theta
@@ -168,7 +174,7 @@ class PhiStore:
 
         return self.cache[key]
 
-    # ====== 这里是关键改动 ======
+    # Transfer the computed batch from GPU to CPU
     def _flush(self):
         if not self.buf:
             return
@@ -369,7 +375,7 @@ def calibrate(df, pop_size=10, num_generations=10, seed=2025):
     plt.savefig("progress_cf.png")
     plt.close()
 
-    # 正确写法：按行构造 PhiStore，保证参数签名对齐
+    # Construct PhiStore for each row with the corresponding parameters
     a, b, c, d, kappa, r1, r2, r3, r4 = final_theta
     rates = np.array([r1, r2, r3, r4])
     spot = df.spot_price.iloc[0]
@@ -432,7 +438,7 @@ def calibrate(df, pop_size=10, num_generations=10, seed=2025):
 
 # ── 脚本入口 ──
 if __name__ == "__main__":
-    df = pd.read_excel(r"C:\Users\26876\Desktop\Math548\Project\02_jan_put.xlsx")
+    df = pd.read_excel(str(_PROJECT_ROOT / "02_jan_put.xlsx"))
     df = df.rename(columns={
         "Strike_Put": "k", "TTM_Put": "T", "mid_price_Put": "opt_price"
     })

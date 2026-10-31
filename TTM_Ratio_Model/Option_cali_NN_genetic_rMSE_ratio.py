@@ -1,5 +1,5 @@
 # ──────────────────────────────────────────────────────────────────────────────
-# 改进版 Option_cali_NN_genetic_2stage_relative.py
+# Two-stage surrogate calibration with relative MSE
 # -----------------------------------------------------------------------------
 """
 2‑Stage Calibration with **Relative MSE (rMSE)** loss
@@ -11,6 +11,12 @@ Compatible with CUDA inference, multiprocessing for GA fitness, and
 produces progress & diagnostic plots.
 """
 
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+_PROJECT_ROOT = _Path(_os.environ.get("GPU_NN_PROJECT_ROOT", str(_REPO_ROOT / "Data_Results"))).expanduser()
+
 import pathlib, joblib, numpy as np, pandas as pd, torch
 import torch.nn as nn
 import pygad, multiprocessing as mp, sys, time
@@ -18,7 +24,7 @@ import matplotlib.pyplot as plt, matplotlib.cm as cm
 from scipy.optimize import minimize
 
 # ─── 1. Paths & Constants ─────────────────────────────────────────────────────
-PROJECT_DIR = pathlib.Path(r"C:\Users\26876\Desktop\Math548\Project\TTM_Ratio_Results")
+PROJECT_DIR = pathlib.Path(str(_PROJECT_ROOT / "TTM_Ratio_Results"))
 MODEL_W     = PROJECT_DIR / "model_5000_ratio.pt"
 SCALERS_PKL = PROJECT_DIR / "scalers_5000_ratio.pkl"
 T_LIST      = np.array([258, 100, 48, 20], dtype=float) / 252  # trading‑days → years
@@ -223,7 +229,7 @@ def calibrate(df: pd.DataFrame, device="cpu", *,
 
 # ─── 6. Script Entry ─────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    df = (pd.read_excel(r"C:\Users\26876\Desktop\Math548\Project\02_jan_put.xlsx")
+    df = (pd.read_excel(str(_PROJECT_ROOT / "02_jan_put.xlsx"))
             .rename(columns={"Strike_Put":"k", "TTM_Put":"T", "mid_price_Put":"opt_price"}))
     df["opt_price"] /= 100
     df["T"] /= 252

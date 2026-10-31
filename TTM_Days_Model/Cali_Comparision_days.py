@@ -1,22 +1,28 @@
-# ─────────── nn_price_plot.py ───────────
+# Cali_Comparision_days.py
 """
-After running nn_calibrator.py and obtaining the optimal parameter vector
+After running Option_cali_NN_T_DAYs.py and obtaining the parameter vector
 `theta*  = [a,b,c,d,kappa,r1,r2,r3,r4]`,
 this script:
 1.  Loads the trained neural network and the scalers.
 2.  Uses theta* to generate model prices for every row in the input Excel file.
-3.  Plots model prices (+) against market prices (o) exactly like the sample figure.
+3.  Plots model prices (+) against market prices (o).
 """
+
+import os as _os
+from pathlib import Path as _Path
+
+_REPO_ROOT = _Path(__file__).resolve().parents[1]
+_PROJECT_ROOT = _Path(_os.environ.get("GPU_NN_PROJECT_ROOT", str(_REPO_ROOT / "Data_Results"))).expanduser()
 
 import pathlib, joblib, numpy as np, pandas as pd, torch
 import matplotlib.pyplot as plt
 import sys
-sys.path.append(r"/Course_project/Math548/Option_Pricing548")
+sys.path.append(str(_REPO_ROOT))
 
 # --------------------------------------------------------------------------- #
-# 1.  paths & constants (adjust if yours differ)
+# 1.  paths & constants
 # --------------------------------------------------------------------------- #
-PROJECT_DIR = pathlib.Path(r"C:\Users\26876\Desktop\Math548\Project")
+PROJECT_DIR = pathlib.Path(str(_PROJECT_ROOT))
 MODEL_W     = PROJECT_DIR / "model_5000_days.pt"
 SCALERS_PKL = PROJECT_DIR / "scalers_5000_days.pkl"
 
@@ -95,7 +101,7 @@ def price_and_plot(excel_path: str, theta_opt, device="cpu"):
 
     # 4.3 attach to dataframe (optional)
     df["model_price"] = model_prices
-    # 🆕 4.3.5 print model price and market price
+    # 4.3.5 print model price and market price
     for i, row in df.iterrows():
         print(f"Strike: {row['k']:.2f}, Market Price: {row['opt_price']:.4f}, Model Price: {row['model_price']:.4f}")
     # 4.4 plot
@@ -109,7 +115,7 @@ def price_and_plot(excel_path: str, theta_opt, device="cpu"):
     ax.legend()
     ax.set_ylim(bottom=0)
     plt.tight_layout()
-    plt.savefig(r"C:\Users\26876\Desktop\Math548\Project\put_price_fit.png", dpi=300)  # ← 加这一行
+    plt.savefig(str(_PROJECT_ROOT / "put_price_fit.png"), dpi=300)  # Save the calibration-fit figure
     plt.show()
 
     return df
@@ -118,7 +124,7 @@ def price_and_plot(excel_path: str, theta_opt, device="cpu"):
 # 5.  example usage
 # --------------------------------------------------------------------------- #
 if __name__ == "__main__":
-    # theta_opt should be the array printed by nn_calibrator.calibrate(...)
+    # theta_opt should be the parameter array returned by the selected calibrator
     theta_opt1 = [
         0.020442,  # a
         2.725817,  # b
@@ -143,7 +149,7 @@ if __name__ == "__main__":
     ]#RELATIVE MSE
 
     price_and_plot(
-        excel_path=r"C:\Users\26876\Desktop\Math548\Project\02_jan_put.xlsx",
+        excel_path=str(_PROJECT_ROOT / "02_jan_put.xlsx"),
         theta_opt=theta_opt,
         device="cuda"                                                # or "cpu"
     )
